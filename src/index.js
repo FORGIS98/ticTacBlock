@@ -3,34 +3,68 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 
-class Square extends React.Component {
+//__ class Square extends React.Component {
+//__ 
+//__   //  Constructor for square (not needed because Square doesn't keep track of
+//__   //  the game's state.)
+//__ //  constructor(props){
+//__ //    // super() is needes in js classes when defining the constructor
+//__ //    super(props);
+//__ //    // this.state will "remember" that we've clicked the square
+//__ //    this.state = {
+//__ //      value: null,
+//__ //    }
+//__ //  }
+//__ 
+//__   render() {
+//__     return (
+//__       <button 
+//__       className="square" 
+//__       onClick = {() => this.props.onClick({value: 'X'})}
+//__       >
+//__ 
+//__       {this.props.value}
+//__ 
+//__       </button>
+//__     );
+//__   }
+//__ }
 
-  constructor(props){
-    // super() is needes in js classes when defining the constructor
-    super(props);
-    // this.state will "remember" that we've clicked the square
-    this.state = {
-      value: null,
-    }
-  }
-
-  render() {
-    return (
-      <button 
-      className="square" 
-      onClick = {() => this.setState({value: 'X'})}
-      >
-
-      {this.state.value}
-
-      </button>
-    );
-  }
+// Function components are a simpler way to write components 
+// that only contain a render method and don’t have their own state. 
+function Square(props){
+  return(
+    <button className="square" onClick={props.onClick}>
+    {props.value}
+    </button>
+  );
 }
 
 class Board extends React.Component {
+
+  constructor(props){
+    super(props);
+    // This will save the state of the game
+    this.state = {
+      squares: Array(9).fill(null),
+    };
+  }
+
+  handleClick(i){
+    // with .slice() we create a copy of the original array so we don't
+    // change the real array directly (immutability is important)
+    const squares = this.state.squares.slice();
+    squares[i] = 'X'
+    this.setState({squares: squares});
+  }
+
   renderSquare(i) {
-    return <Square value = {i}/>;
+    return (
+      <Square 
+      value = {this.state.squares[i]}
+      onClick = {() => this.handleClick(i)}
+      />
+    );
   }
 
   // Returns a description of what you want to see on the screen.
