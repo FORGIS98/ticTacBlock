@@ -42,11 +42,71 @@ function Square(props){
 
 class Board extends React.Component {
 
+  // Commented for Adding Time Travel
+  // constructor(props){
+  //   super(props);
+  //   // This will save the state of the game
+  //   this.state = {
+  //     squares: Array(9).fill(null),
+  //     xIsNext: true,
+  //   };
+  // }
+
+  renderSquare(i) {
+    return (
+      <Square 
+      value = {this.props.squares[i]}
+      onClick = {() => this.props.onClick(i)}
+      />
+    );
+  }
+
+  // Returns a description of what you want to see on the screen.
+  render() {
+   return (
+
+      <div>
+        <div className="board-row">
+          {this.renderSquare(0)}
+          {this.renderSquare(1)}
+          {this.renderSquare(2)}
+        </div>
+        <div className="board-row">
+          {this.renderSquare(3)}
+          {this.renderSquare(4)}
+          {this.renderSquare(5)}
+        </div>
+        <div className="board-row">
+          {this.renderSquare(6)}
+          {this.renderSquare(7)}
+          {this.renderSquare(8)}
+        </div>
+      </div>
+
+      // Another way (maybe more pro) of doing the return is by using
+      // JSX syntax like so:
+
+      // React.createElement("div", null, React.createElement("div", {
+      //   className: "status"
+      // }, status), React.createElement("div", {
+      //   className: "board-row"
+      // }, this.renderSquare(0), this.renderSquare(1), this.renderSquare(2)), React.createElement("div", {
+      //   className: "board-row"
+      // }, this.renderSquare(3), this.renderSquare(4), this.renderSquare(5)), React.createElement("div", {
+      //   className: "board-row"
+      // }, this.renderSquare(6), this.renderSquare(7), this.renderSquare(8)))
+    );
+  }
+}
+
+class Game extends React.Component {
+
   constructor(props){
     super(props);
-    // This will save the state of the game
     this.state = {
-      squares: Array(9).fill(null),
+      history: [{
+        squares: Array(9).fill(null),
+      }],
       xIsNext: true,
     };
   }
@@ -54,7 +114,9 @@ class Board extends React.Component {
   handleClick(i){
     // with .slice() we create a copy of the original array so we don't
     // change the real array directly (immutability is important)
-    const squares = this.state.squares.slice();
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
 
     // If there is a winner or a square is already fill we just return
     // So a player can't change a value already in the game
@@ -63,75 +125,36 @@ class Board extends React.Component {
     
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
-      squares: squares,
+      history: history.concat([{
+        squares: squares,
+      }]),
       xIsNext: !this.state.xIsNext,
     });
   }
 
-  renderSquare(i) {
-    return (
-      <Square 
-      value = {this.state.squares[i]}
-      onClick = {() => this.handleClick(i)}
-      />
-    );
-  }
-
-  // Returns a description of what you want to see on the screen.
   render() {
-    const winner = calculateWinner(this.state.squares);
+
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
+
     let status;
     if(winner)
       status = 'Winner: ' + winner;
     else
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
-    return (
 
-      // <div>
-      //   <div className="status">{status}</div>
-      //   <div className="board-row">
-      //     {this.renderSquare(0)}
-      //     {this.renderSquare(1)}
-      //     {this.renderSquare(2)}
-      //   </div>
-      //   <div className="board-row">
-      //     {this.renderSquare(3)}
-      //     {this.renderSquare(4)}
-      //     {this.renderSquare(5)}
-      //   </div>
-      //   <div className="board-row">
-      //     {this.renderSquare(6)}
-      //     {this.renderSquare(7)}
-      //     {this.renderSquare(8)}
-      //   </div>
-      // </div>
-
-      // Another way (maybe more pro) of doing the return is by using
-      // JSX syntax like so:
-
-      React.createElement("div", null, React.createElement("div", {
-        className: "status"
-      }, status), React.createElement("div", {
-        className: "board-row"
-      }, this.renderSquare(0), this.renderSquare(1), this.renderSquare(2)), React.createElement("div", {
-        className: "board-row"
-      }, this.renderSquare(3), this.renderSquare(4), this.renderSquare(5)), React.createElement("div", {
-        className: "board-row"
-      }, this.renderSquare(6), this.renderSquare(7), this.renderSquare(8)))
-    );
-  }
-}
-
-class Game extends React.Component {
-  render() {
     return (
       <div className="game">
       <div className="game-board">
-      <Board />
+      <Board 
+      squares = {current.squares}
+      onClick = {(i) => this.handleClick(i)}
+      />
       </div>
       <div className="game-info">
-      <div>{/* status */}</div>
+      <div>{status}</div>
       <ol>{/* TODO */}</ol>
       </div>
       </div>
