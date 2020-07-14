@@ -1,14 +1,19 @@
 {
   "name": "tictacblock",
   "version": "0.1.0",
-  "private": true,
+  "author": "Jorge Sol aka FORGIS",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "chai": "^4.2.0",
+    "fs": "0.0.1-security",
+    "mocha": "^8.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "truffle": "^5.1.34",
+    "web3": "^1.2.9"
   },
   "scripts": {
     "start": "react-scripts start",
