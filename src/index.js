@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+// We add our super cool smart contract and the abi json file
+import useTickTackBlock from "./contracts/tickTackBlock.sol";
+import tickTackAbi from "./abis/tickTackBlock.json";
+// We add web3 library to interact with the blockchain
+import Web3 from 'web3';
+
+const json = require('./abis/tickTackBlock.json');
 
 //__ class Square extends React.Component {
 //__ 
@@ -101,6 +108,42 @@ class Board extends React.Component {
 
 class Game extends React.Component {
 
+  //// BLOCKCHAIN DATA AND INFO ////
+
+  // This method is invoked just before mounting occurs, called before render()
+  async UNSAFE_componentWillMount(){
+    await this.loadWeb3Data() // This function will connect to the blockchain provider
+    await this.loadLocalBlockchainData() // This will aloud as to check accounts, balances, transactions...all kind blockchain methods.
+  }
+
+  async loadWeb3Data(){
+    // This will check if there is any ethereum wallet or something like MetaMask
+    if(typeof window.ethereum !== 'undefined'){
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable() // This will sait until user logs into metamask (or the wallet app installed in the browser)
+    }
+    else
+      window.alert("Non-ethereum browser detected, try installing MetaMask ^_^")
+  }
+
+  async loadLocalBlockchainData(){
+    const web3 = window.web3 // We connect to web3 
+    const accounts = await web3.eth.getAccounts() // Get all the accounts in metamask
+    this.setState({ account: accounts[0] })
+
+    // We take the smart contract address
+    const address = json["networks"]["5777"]["address"];
+    // We instantiate the contract to be aible to interact with it from js
+    const contract = new web3.eth.Contract(tickTackAbi.abi, address)
+
+  }
+
+
+
+
+
+  //// //// //// ////
+
   constructor(props){
     super(props);
     this.state = {
@@ -109,6 +152,11 @@ class Game extends React.Component {
       }],
       xIsNext: true,
       stepNumber: 0,
+
+
+      // Extras for the blockchain
+      account: '',
+      transactions: [],
     };
   }
 
