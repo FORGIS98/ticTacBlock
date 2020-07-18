@@ -135,7 +135,11 @@ class Game extends React.Component {
     const address = json["networks"]["5777"]["address"];
     // We instantiate the contract to be aible to interact with it from js
     const contract = new web3.eth.Contract(tickTackAbi.abi, address)
-
+    this.setState({smartContract: contract})
+    // We get all the past events on the blockchain
+    const transactions = await contract.getPastEvents('playerPlay', {fromBlock: 0, toBlock: 'latest'})
+    this.setState({transactions: transactions})
+    console.log(transactions)
   }
 
 
@@ -157,10 +161,30 @@ class Game extends React.Component {
       // Extras for the blockchain
       account: '',
       transactions: [],
+      smartContract: null,
     };
+
+    this.playerPlay.bind(this);
+
+  }
+
+  playerPlay(player, position){
+    this.state.smartContract.methods.playerPlay(player, position).send({from: this.state.account})
   }
 
   handleClick(i){
+
+    // BEGIN BLOCKCHAIN //
+
+    const player = this.state.xIsNext ? 'X' : 'O';
+    this.playerPlay(player, i)
+
+
+
+    // END BLOCKCHAIN //
+
+
+
     // with .slice() we create a copy of the original array so we don't
     // change the real array directly (immutability is important)
 
@@ -178,7 +202,8 @@ class Game extends React.Component {
     if(calculateWinner(squares) || squares[i])
       return;
     
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    // squares[i] = this.state.xIsNext ? 'X' : 'O';
+    squares[i] = player;
     this.setState({
       history: history.concat([{
         squares: squares,
